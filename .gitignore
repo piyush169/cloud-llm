@@ -1,7 +1,7 @@
 .venv/
 __pycache__/
 *.pyc
-rag/data/
+data/
 rag/indexes/
 rag/outputs/*.csv
 out/
