@@ -1,26 +1,28 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    STREAMLIT_SERVER_HEADLESS=true \
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false \
+    STREAMLIT_SERVER_FILE_WATCHER_TYPE=none
 
 WORKDIR /app
 
-# system deps
+# System deps (optional but useful for many ML wheels)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    git \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# python deps
+# Install Python deps
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
-# app code
+# Copy app code + already-built indexes (if present in repo)
 COPY . .
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    awscli build-essential git curl && rm -rf /var/lib/apt/lists/*
+EXPOSE 8501
 
-# HF Spaces expects app on port 7860
-ENV PORT=7860
-EXPOSE 7860
-
-CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
+# Only run Streamlit app (no chunking/indexing commands)
+CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]
