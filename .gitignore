@@ -5,3 +5,4 @@ data/
 rag/indexes/
 rag/outputs/*.csv
 out/
+.env
